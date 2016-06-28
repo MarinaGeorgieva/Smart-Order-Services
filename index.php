@@ -14,16 +14,14 @@
 
 
 <?php
-
-	 // 	$sql = "INSERT INTO products (description, price, category";
-		// $sql .= ") VALUES ('fanta lemon', 1.70, 'drinks')";
-		// $result = $conn->query($sql);
-		// if($result){
+	 // $sql = "INSERT INTO products (description, price, category";
+	// $sql .= ") VALUES ('fanta lemon', 1.70, 'drinks')";
+	// $result = $conn->query($sql);
+	// if($result){
 		// 	echo "New record created successfully!";
-		// }
-		// else{
-
+	// }
+	// else{	
 		// 	echo "Error!" . $sql . "<br />" . $conn->error;
-		// }
+	// }
 
 ?>
