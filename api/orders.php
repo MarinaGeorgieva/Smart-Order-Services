@@ -95,6 +95,32 @@ function get_all_by_table($table_id) {
 	return $data;
 }
 
+function insert_order($table_id) {
+	global $connection;
+	$sql = "INSERT INTO orders (table_id) VALUES (:table_id)";
+	$stmt = $connection->prepare($sql);
+	$stmt->bindParam(":table_id", $table_id);
+	$result = $stmt->execute();
+
+	if (!$result) {
+		return 0;
+	}
+
+	$id = $connection->lastInsertId();
+	return $id;
+}
+
+function insert_product_order($product_id, $order_id, $quantity) {
+	global $connection;
+	$sql = "INSERT INTO products_orders (product_id, order_id, quantity) 
+			VALUES (:product_id, :order_id, :quantity)";
+	$stmt = $connection->prepare($sql);
+	$stmt->bindParam(":product_id", $product_id);
+	$stmt->bindParam(":order_id", $order_id);
+	$stmt->bindParam(":quantity", $quantity);
+	$stmt->execute();
+}
+
 function request_order($id, $table_id) {
 	// json response array
 	$response = array("message" => "", "code" => 200);
@@ -125,9 +151,42 @@ function request_orders($table_id) {
 }
 
 function make_order() {
+	$response = array("message" => "", "code" => 200);
 	$json = file_get_contents('php://input');
 	$order = json_decode($json);
 	
+	if (isset($order->table_id) && isset($order->products)) {
+
+		// receiving the post params
+	    $table_id = $order->table_id;
+	    $products = $order->products;
+	 
+	    $order_id = insert_order($table_id);
+
+	    if ($order_id == 0) {
+	    	$response["code"] = 404;
+	    	$response["message"] = "Cannot make order!";
+	    	echo json_encode($response);
+	    }
+	    else {
+	    	foreach ($products as $product) {
+	    		$product_id = $product->product_id;
+	    		$quantity = $product->quantity;
+	    		insert_product_order($product_id, $order_id, $quantity);
+	    	}
+
+	    	$response["message"] = "Successfully ordered!";
+	        $response["code"] = 200;
+	        // Return the new order if necesssary
+	        echo json_encode($response);
+	    }
+	}
+	else {
+	    // required post params are missing
+	    $response["code"] = 404;
+	    $response["message"] = "Required parameters table id or products is missing!";
+	    echo json_encode($response);
+	}
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["id"]) && isset($_GET["table"])) {
