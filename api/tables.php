@@ -4,7 +4,7 @@ require_once '../db.php';
 
 function get_by_id($id) {
 	global $connection;	
-	$sql = "SELECT * FROM products WHERE id=:id";
+	$sql = "SELECT * FROM tables WHERE id=:id";
 	$stmt = $connection->prepare($sql);
 	$stmt->bindParam(":id", $id);
 	$stmt->execute();
@@ -12,7 +12,7 @@ function get_by_id($id) {
 	$data = array();
 
 	while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-		$data["products"][] = $row;
+		$data["tables"][] = $row;
 	}
 
 	return $data;
@@ -20,19 +20,19 @@ function get_by_id($id) {
 
 function get_all() {
 	global $connection;
-	$sql = "SELECT * FROM products";
+	$sql = "SELECT * FROM tables";
 	$stmt = $connection->prepare($sql);
 	$stmt->execute();
-	$productsData = array();
+	$data = array();
 
 	while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-		$productsData['products'][] = $row;
+		$data['tables'][] = $row;
 	}
 
-	return $productsData;
+	return $data;
 }
 
-function request_product($id) {
+function request_table($id) {
 	// json response array
 	$response = array("message" => "", "code" => 200);
 	$data = get_by_id($id);
@@ -41,14 +41,14 @@ function request_product($id) {
 		$response["code"] = 404;
 	    $response["message"] = "Required parameter id is not valid!";
 	}
-
-	$response["data"] = $data;
-
+	else {
+		$response["data"] = $data;
+	}
 	
 	echo json_encode($response);
 }
 
-function request_products() {
+function request_tables() {
 	// json response array
 	$response = array("message" => "", "code" => 200);
 	$data = get_all();
@@ -59,11 +59,12 @@ function request_products() {
 }
  
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["id"])) {
-	request_product($_GET["id"]);
+	request_table($_GET["id"]);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && !isset($_GET["id"])) {
-	request_products();
+	request_tables();
 }
+
 
 ?>
