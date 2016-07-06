@@ -46,7 +46,7 @@ function get_all() {
 		$order["table_id"] = $value["table_id"];
 		$order["total"] = total_price_per_order($value["id"], $value["table_id"]);
 
-		$sql = "SELECT po.product_id, p.price, po.quantity FROM orders o 
+		$sql = "SELECT p.name, p.price, po.quantity FROM orders o 
 			JOIN products_orders po ON o.id=po.order_id 
 			JOIN products p ON p.id=po.product_id
 			WHERE o.table_id=:table_id AND o.id=:id AND o.state=0";
